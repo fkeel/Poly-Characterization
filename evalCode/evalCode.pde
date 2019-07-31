@@ -22,12 +22,12 @@ int weightsStrain[] = {10, 20, 50, 100}; //populate array with weights to use in
 
 int numberOfSamples = 300; //how many samples should be recorded
 int numberOfConditions = 2; //pressure vs stretch
-String[] conditions ={"Pressure",  "SquareResistance", "Stretch"}; //name of the conditions 
-String[] actions ={"press",  "hold", "release"};  //name of the actions
+String[] conditions ={"PressureDynamics", "Pressure",  "SquareResistance", "Stretch"}; //name of the conditions 
+
 
 int lineCounter = 0; //will be incremented with each writing
-String currentCondition; 
-String currentAction;
+int currentCondition = 0;
+String currentConditionName; 
 int currentRepetition; 
 
 //log this --> ID, currentCondition, currentAction, currentRepitition, textileReading, textileResistance, newton
@@ -59,7 +59,7 @@ void setup() {
 
 
   //experiment logic
-  currentCondition = 0;
+ // currentCondition = 0; <--- index/samples
   updateArduino();
 }
 
@@ -67,8 +67,38 @@ void draw() {
   //set the background
   background(180, 170, 210);
   fill(255);
-  textAlign(NORMAL);
+
   textAlign(CENTER);
+  
+  //experimental Logic
+  if(currentConditionName.equals("PressureDynamics")){
+   //start measuring (maybe time this too?)
+   //flag pressure onset
+   //time until end of pressure
+   //time until end of measure
+  } else if (currentConditionName.equals("Pressure")){
+    //for(each weight){
+      //place weight
+      //wait for stabilize
+      //collect 200 samples
+    //}
+  } else if (currentConditionName.equals("SquareResistance"){
+    //apply clamps
+    //make fabric as relaxed as possible
+    //wait for stablize
+    //collect 200 samples
+  } else if (currentConditionName.equals("Stretch"){
+    //note the direction of stretch (input field!)
+    //apply 500g
+    //release
+    //start measuring (loop through weights)
+  }
+  
+  
+
+
+//stretch in direction of the courses: https://www.kobakant.at/DIY/?p=5689
+
   //display the buttons by providing them with x & y coordinate as well as height and width
   next.display(800, 400, 100, 60);
   pause.display(450, 400, 100, 60);
@@ -116,7 +146,6 @@ void goNext() {
   appendTextToFile(filename, textileID + ",\t ");
   appendTextToFile(filename, currentTime() + ",\t ");
   appendTextToFile(filename, currentCondition + ",\t\t ");
-  appendTextToFile(filename, currentAction + ",\t\t ");
   appendTextToFile(filename, textileReading + ",\t\t ");
   appendTextToFile(filename, textileResistance + ",\t\t ");
   appendTextToFile(filename, newton + ",\t\t ");
