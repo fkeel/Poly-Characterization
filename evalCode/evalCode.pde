@@ -4,9 +4,28 @@
 import java.io.BufferedWriter; //log lines
 import java.io.FileWriter; //create files
 
-// for sending to arduino
-import processing.serial.*;
-Serial arduino;
+//----------Serial---------------//
+import processing.serial.*; //include the serial library
+
+Serial arduinoPort;  // The serial port at which we listen to data from the Arduino 
+String rawIncomingValues; //this is where you dump the content of the serial port
+int[] incomingValues = { 0, 0, 0, 0, 0, 0, 0 };     //this is where you will store the incoming values, so you can use them in your program
+int token = 10; //10 is the linefeed number in ASCII
+//You can replace it with whatever symbol marks the end of your line (http://www.ascii-code.com/)
+boolean connectionEstablished = false;
+//---------end--Serial----------//
+
+
+//----------Configure ReadingToResistance Stuff---------------//
+
+
+long resistor2Values[] = {10000000, 1000000, 100000, 10000, 1000, 220, 10};
+float voltage = 3.3;
+float[] calculatedVoltages  = { 0, 0, 0, 0, 0, 0, 0 }; 
+float[] calculatedResistance  = { 0, 0, 0, 0, 0, 0, 0 }; 
+int midPoint = 1024; //use this for chosing which resistance calculation is the most reliable
+
+//----------------------------------------------------------//
 
 int textileID; // serialStep1Step2 --> 000_000_0000 --> ID_Minutes_Minutes
 int sampleID; // count the number of samples collected 
@@ -48,10 +67,20 @@ void setup() {
   textFont(font);
 
   size(1000, 600);
-  String portName = Serial.list()[0];
-  println(portName);
-  arduino = new Serial(this, portName, 9600);
-
+  
+  //--------Serial-----------//
+    // List all the available serial ports
+  println("these are the available ports: ");
+  printArray(Serial.list());
+  //chose your serial port, by putting the correct number in the square brackets 
+  //you might need to just trial and error this, the first time you do it
+  String serialPort = Serial.list()[0];
+  //check if you are using the port you think you are using
+  println("You are using this port: " + serialPort);
+  // Open the port with the same baud rate you set in your arduino
+  arduinoPort = new Serial(this, serialPort, 9600);
+ //-----------endSerial------------//
+ 
   //initializing the buttons. The text is formatted like this: "name of button: button hotkey"
   next = new Button("next:n");
   previous = new Button("previous:p");
@@ -71,28 +100,28 @@ void draw() {
   textAlign(CENTER);
   
   //experimental Logic
-  if(currentConditionName.equals("PressureDynamics")){
+//  if(currentConditionName.equals("PressureDynamics")){
    //start measuring (maybe time this too?)
    //flag pressure onset
    //time until end of pressure
    //time until end of measure
-  } else if (currentConditionName.equals("Pressure")){
+//  } else if (currentConditionName.equals("Pressure")){
     //for(each weight){
       //place weight
       //wait for stabilize
       //collect 200 samples
     //}
-  } else if (currentConditionName.equals("SquareResistance"){
+//  } else if (currentConditionName.equals("SquareResistance"){
     //apply clamps
     //make fabric as relaxed as possible
     //wait for stablize
     //collect 200 samples
-  } else if (currentConditionName.equals("Stretch"){
+//  } else if (currentConditionName.equals("Stretch"){
     //note the direction of stretch (input field!)
     //apply 500g
     //release
     //start measuring (loop through weights)
-  }
+//  }
   
   
 
@@ -160,9 +189,4 @@ void goNext() {
 
 String currentTime() {
   return String.valueOf(hour()) + ":" + String.valueOf(minute()) +  " " + String.valueOf(day()) +  "/"  + String.valueOf(month()) +  "/" +   String.valueOf(year());
-}
-
-
-void stop() {
-  arduino.write("f 0 0");
 }
