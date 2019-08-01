@@ -8,10 +8,10 @@ const int ADCbitDepth = 10; // typical arduino MCUs use 10bits ADC
 //#define EMBED_RESISTANCE_CALCULATION
 
 const int analogInPin = A5;  // Input from polymerized sensor
-const int numberOfResistors = 7;
-const int resistor2Pin[] = {2, 3, 4, 5, 8, 9, 10};
-const long resistor2Values[] = {10000000, 1000000, 100000, 10000, 1000, 220, 10};
-const float Vin = 3.3;
+const int resistor2Pin[] =      {       2,       3,      4,      5,     6,     7,    8,    9,  10,  11, 15, 16,  17};
+const float resistor2Values[] = {10000000, 1000000, 330000, 100000, 47000, 10000, 4700, 1000, 470, 220, 47, 10, 4.7};
+const int numberOfResistors = 13; //this need not be a magic number
+const float Vin = 3.3; // Update this, if you're using a 5v board
 
 int adcReadings[numberOfResistors] = {0}; //array for storing the readings
 
@@ -63,11 +63,13 @@ void loop() {
   Serial.println(resistanceEstimates[numberOfResistors - 1]);
   //end print to serial
 
+//ToDo: Add function that selects the best estimate of resistance. Chose the voltage divider where Vout is closest to Vin/2
+
 #else
 
   for (int i = 0; i < numberOfResistors; i++) { //pull pins high one at a time and read, then pull low again.
     pinMode(resistor2Pin[i], OUTPUT);
-    int averageNum = 0;
+    int averageNum = 3;
     adcReadings[i] = 0;
     for (int a = 0; a < averageNum; a++)
         adcReadings[i] += analogRead(analogInPin); //some averaging, to decrease noise
