@@ -73,9 +73,9 @@ Button placeWeight;
 String taskname;
 String instructions = null;
 String timer = "";
-int[] pos_tn = { 600, 150 };
-int[] pos_inst = { 600, 175 };
-int[] pos_timer = { 600, 200 };
+int[] pos_tn = { 500, 150 };
+int[] pos_inst = { 500, 175 };
+int[] pos_timer = { 500, 200 };
 
 //font to make things look nice
 PFont font;
@@ -194,13 +194,11 @@ void draw() {
       case 0:
         if(instructions == null) {
           if(wid < weightsPressure.length) { instructions = String.format("Place %dg on the material", weightsPressure[wid]); }
-          else { taskStage = 2; }
+          else { taskStage = 3; }
         }
         if(spacePressed) {
           taskStage = 1;
-          //recordM.recordNM(true);
-          // TO REMOVE
-          recordM.recordNM(false);
+          recordM.recordNM(true);
           recording = true;
           spacePressed = false;
           instructions = "Recording...";
@@ -213,14 +211,17 @@ void draw() {
         if(dt > taskDelays[currentTask]) {
           instructions = String.format("Remove the weight from the material (saving data in %s)", filename);
           timer = null;
-          taskStage = 0;
-          recording = true;
-          recordM.record(textileID, taskname, weightsPressure[wid]);
-          instructions = null;
-          wid++;
+          taskStage = 2;
         }
         break;
-      case 2:
+      case 2: // saving data
+        recording = false;
+        recordM.record(textileID, taskname, weightsPressure[wid]);
+        instructions = null;
+        wid++;
+        taskStage = 0;
+        break;
+      case 3:
         instructions = "All data recorded in "+filename+"!";
         break;
     }
@@ -244,12 +245,14 @@ void draw() {
           instructions = String.format("Task finished (recording data)", filename);
           timer = null;
           taskStage = 2;
-          recording = false;
-          recordM.record(textileID, taskname, weightsPressure[wid]);
-          wid++;
         }
         break;
       case 2:
+        recording = false;
+        recordM.record(textileID, taskname, -1);
+        taskStage = 3;
+        break;
+      case 3:
         instructions = "All data recorded in "+filename+"!";
         break;
     }
@@ -257,8 +260,8 @@ void draw() {
         switch(taskStage) {
       case 0:
         if(instructions == null) {
-          if(wid < weightsPressure.length) { instructions = String.format("Stretch the material with %dg", weightsPressure[wid]); }
-          else { taskStage = 2; }
+          if(wid < weightsPressure.length) { instructions = String.format("Stretch the material with %dg", weightsStrain[wid]); }
+          else { taskStage = 3; }
         }
         if(spacePressed) {
           taskStage = 1;
@@ -275,14 +278,17 @@ void draw() {
         if(dt > taskDelays[currentTask]) {
           instructions = String.format("Remove the weight (saving data in %s)", filename);
           timer = null;
-          taskStage = 0;
-          recording = false;
-          recordM.record(textileID, taskname, weightsPressure[wid]);
-          instructions = null;
-          wid++;
+          taskStage = 2;
         }
         break;
       case 2:
+        recording = false;
+        recordM.record(textileID, taskname, weightsStrain[wid]);
+        instructions = null;
+        wid++;
+        taskStage = 0;
+        break;
+      case 3:
         instructions = "All data recorded in "+filename+"!";
         break;
     }
@@ -297,10 +303,10 @@ void draw() {
 
 
   // for debugging
-  //if(recording) {
-  //  recordM.addValues(new int[]{ 0, 1, 2, 3, 4, 5, 6, 7, 8 });
-  //  recordM.addNMValue(10);
-  //}
+  if(recording) {
+    recordM.addValues(new int[]{ 0, 1, 2, 3, 4, 5, 6, 7, 8 });
+    recordM.addNMValue(10);
+  }
 
 
 
