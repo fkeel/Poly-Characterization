@@ -38,27 +38,44 @@ int textileResistance; //calculate resistance based on voltage divider formula
 int newton; // newton
 
 String filename = "testrun2.txt";
+boolean spacePressed = false;
+boolean recording = false;
+int startTime = -1;
+int countdown;
+int[] taskDelays = { 5000 /*PressureDynamics*/, 2000 /*Pressure*/, 2000 /*Square*/, 2000 /*Stretching*/};
+RecordManager recordM = new RecordManager();
 
-int weightsPressure[] = {10, 20, 50, 100}; //populate array with weights to use in characterization
+int wid = 0;
+int weightsPressure[] = {5, 10, 20, 50, 100, 200, 500}; //populate array with weights to use in characterization
 int weightsStrain[] = {10, 20, 50, 100}; //populate array with weights to use in characterization
 
 int numberOfSamples = 300; //how many samples should be recorded
-int numberOfConditions = 2; //pressure vs stretch
-String[] conditions ={"PressureDynamics", "Pressure", "SquareResistance", "Stretch"}; //name of the conditions 
+//int numberOfConditions = 4; //pressure vs stretch
+String[] tasks ={"PressureDynamics", "Pressure", "SquareResistance", "Stretch"}; //name of the tasks
 boolean weightPlaced = false;
+int taskStage = 0;
 
 int lineCounter = 0; //will be incremented with each writing
-int currentCondition = 0;
-String currentConditionName; 
-int currentRepetition; 
+int currentTask = 0;
+//String currentConditionName; 
+//int currentRepetition;
 
 //log this --> ID, currentCondition, currentAction, currentRepitition, textileReading, textileResistance, newton
+
+//----------------UI features-----------------//
 
 //some buttons to do stuff with
 Button next;
 Button previous;
 Button pause;
 Button placeWeight;
+
+String taskname;
+String instructions = null;
+String timer = "";
+int[] pos_tn = { 600, 150 };
+int[] pos_inst = { 600, 175 };
+int[] pos_timer = { 600, 200 };
 
 //font to make things look nice
 PFont font;
@@ -78,11 +95,11 @@ void setup() {
   printArray(Serial.list());
   //chose your serial port, by putting the correct number in the square brackets 
   //you might need to just trial and error this, the first time you do it
-  String serialPort = Serial.list()[0];
+  //String serialPort = Serial.list()[0];
   //check if you are using the port you think you are using
-  println("You are using this port: " + serialPort);
+  //println("You are using this port: " + serialPort);
   // Open the port with the same baud rate you set in your arduino
-  arduinoPort = new Serial(this, serialPort, 9600);
+  //arduinoPort = new Serial(this, serialPort, 9600);
   //-----------endSerial------------//
 
   //initializing the buttons. The text is formatted like this: "name of button: button hotkey"
@@ -93,8 +110,11 @@ void setup() {
 
   //experiment logic
   // currentCondition = 0; <--- index/samples
-  updateArduino();
+  //updateArduino();
+  
+  //setupNewtonmeter(nmPort);
 }
+
 
 void draw() {
   //set the background
@@ -102,41 +122,182 @@ void draw() {
   fill(255);
 
   textAlign(CENTER);
-currentConditionName = conditions[0];
+  taskname = tasks[currentTask];
   //experimental Logic
-  if (currentConditionName.equals("PressureDynamics")) {
-    placeWeight.display(20, 20, 200, 200);
-    logLine();
-
-    //start measuring (maybe time this too?)
-    //flag pressure onset
-    //time until end of pressure
-    //time until end of measure
-    //}
-  } else if (currentConditionName.equals("Pressure")) {
-    //for(each weight){
-    //place weight
-    //wait for stabilize
-    //collect 200 samples
-    //}
-  } else if (currentConditionName.equals("SquareResistance")) {
-    //apply clamps
-    //make fabric as relaxed as possible
-    //wait for stablize
-    //collect 200 samples
-  } else if (currentConditionName.equals("Stretch")) {
-    //note the direction of stretch (input field!)
-    //apply 500g
-    //release
-    //start measuring (loop through weights)
+  if (taskname.equals("PressureDynamics")) {
+    //placeWeight.display(20, 20, 200, 200);
+    //logLine();
+  
+    switch(taskStage) {
+      case 0:
+        if(instructions == null) { instructions = "Press the 'space' bar to start recording"; }
+        if(spacePressed) {
+          taskStage = 1;
+          recordM.recordNM(true);
+          recording = true;
+          spacePressed = false;
+          instructions = "Get ready";
+          //startTime = millis();
+          countdown = millis() + 3000;
+        }
+        break;
+      case 1:
+        if(countdown <= millis()) {
+          instructions = "Put the weight on the material";
+          timer = null;
+          taskStage = 2;
+          //recording = false;
+          startTime = millis();
+        } else { 
+          int dt = countdown-millis();
+          timer = (dt/1000) + ":" + (dt%1000);
+        }
+        break;
+      case 2:
+        if(recording) {
+          int dt = millis() - startTime;
+          if(dt > taskDelays[currentTask]) {
+            instructions = "Remove the weight from the material";
+            timer = null;
+            taskStage = 3;
+            //recording = false;
+            startTime = millis();
+          } else { 
+            timer = (dt/1000) + ":" + (dt%1000);
+          }
+        }
+        break;
+      case 3:
+        //if(spacePressed) { recording = true; spacePressed = false; startTime = millis(); }
+        if(recording) {
+          int dt = millis() - startTime;
+          if(dt > taskDelays[currentTask]) {
+            instructions = "Task finished (recording data)";
+            timer = null;
+            taskStage = 4;
+          } else { 
+            timer = (dt/1000) + ":" + (dt%1000);
+          }
+        }
+        break;
+    case 4:
+      recording = false;
+      recordM.record(textileID, taskname, -1);
+      instructions = "Data recorded in "+filename+"!";
+      break;
+    }
+  } else if (taskname.equals("Pressure")) {
+    switch(taskStage) {
+      case 0:
+        if(instructions == null) {
+          if(wid < weightsPressure.length) { instructions = String.format("Place %dg on the material", weightsPressure[wid]); }
+          else { taskStage = 2; }
+        }
+        if(spacePressed) {
+          taskStage = 1;
+          //recordM.recordNM(true);
+          // TO REMOVE
+          recordM.recordNM(false);
+          recording = true;
+          spacePressed = false;
+          instructions = "Recording...";
+          startTime = millis();
+        }
+        break;
+      case 1:
+        int dt = millis() - startTime;
+        timer = (dt/1000) + ":" + (dt%1000);
+        if(dt > taskDelays[currentTask]) {
+          instructions = String.format("Remove the weight from the material (saving data in %s)", filename);
+          timer = null;
+          taskStage = 0;
+          recording = true;
+          recordM.record(textileID, taskname, weightsPressure[wid]);
+          instructions = null;
+          wid++;
+        }
+        break;
+      case 2:
+        instructions = "All data recorded in "+filename+"!";
+        break;
+    }
+  } else if (taskname.equals("SquareResistance")) {
+    switch(taskStage) {
+      case 0:
+        if(instructions == null) { instructions = "Place the electrodes on the material"; }
+        if(spacePressed) {
+          taskStage = 1;
+          recordM.recordNM(false);
+          recording = true;
+          spacePressed = false;
+          instructions = "Recording...";
+          startTime = millis();
+        }
+        break;
+      case 1:
+        int dt = millis() - startTime;
+        timer = (dt/1000) + ":" + (dt%1000);
+        if(dt > taskDelays[currentTask]) {
+          instructions = String.format("Task finished (recording data)", filename);
+          timer = null;
+          taskStage = 2;
+          recording = false;
+          recordM.record(textileID, taskname, weightsPressure[wid]);
+          wid++;
+        }
+        break;
+      case 2:
+        instructions = "All data recorded in "+filename+"!";
+        break;
+    }
+  } else if (taskname.equals("Stretch")) {
+        switch(taskStage) {
+      case 0:
+        if(instructions == null) {
+          if(wid < weightsPressure.length) { instructions = String.format("Stretch the material with %dg", weightsPressure[wid]); }
+          else { taskStage = 2; }
+        }
+        if(spacePressed) {
+          taskStage = 1;
+          recordM.recordNM(false);
+          recording = true;
+          spacePressed = false;
+          instructions = "Recording...";
+          startTime = millis();
+        }
+        break;
+      case 1:
+        int dt = millis() - startTime;
+        timer = (dt/1000) + ":" + (dt%1000);
+        if(dt > taskDelays[currentTask]) {
+          instructions = String.format("Remove the weight (saving data in %s)", filename);
+          timer = null;
+          taskStage = 0;
+          recording = false;
+          recordM.record(textileID, taskname, weightsPressure[wid]);
+          instructions = null;
+          wid++;
+        }
+        break;
+      case 2:
+        instructions = "All data recorded in "+filename+"!";
+        break;
+    }
   }
 
 
-  for (int i = 0; i < numberOfresister2 - 1; i++) { //set all pins as input, so that no current can flow
-    print(resistanceEstimates[i]);
-    print(", ");
-  }
-  println(resistanceEstimates[numberOfresister2 - 1]);
+  //for (int i = 0; i < numberOfresister2 - 1; i++) { //set all pins as input, so that no current can flow
+  //  print(resistanceEstimates[i]);
+  //  print(", ");
+  //}
+  //println(resistanceEstimates[numberOfresister2 - 1]);
+
+
+  // for debugging
+  //if(recording) {
+  //  recordM.addValues(new int[]{ 0, 1, 2, 3, 4, 5, 6, 7, 8 });
+  //  recordM.addNMValue(10);
+  //}
 
 
 
@@ -157,6 +318,7 @@ currentConditionName = conditions[0];
     if (!mousePressed && next.isHover()) {
       //  goNext();
       next.toggle(); //switches button state
+      updateTask(currentTask+1);
     }
   }
 
@@ -169,8 +331,8 @@ currentConditionName = conditions[0];
       //step back
       previous.toggle(); //switches button state
       //currentCondition--; <--needs to be index (also check repititions
-      updateConditions();
-      updateArduino();
+      updateTask(currentTask-1);
+      //updateArduino();
     }
   }
 
@@ -180,22 +342,68 @@ currentConditionName = conditions[0];
     //do something
   } else {
   }
+
+  textAlign(LEFT);
+  if(taskname != null && taskname.length() != 0) {
+    text(taskname, pos_tn[0], pos_tn[1]);
+  }
+  if(instructions != null && instructions.length() != 0) {
+    text(instructions, pos_inst[0], pos_inst[1]);
+  }
+  if(timer != null && timer.length() != 0) {
+    text(timer, pos_timer[0], pos_timer[1]);
+  }
 }
 
-void logLine() {
-  //log this --> ID, currentCondition, currentAction, currentRepitition, textileReading, textileResistance, newton
-  appendTextToFile(filename, textileID + ",\t ");
-  appendTextToFile(filename, currentTime() + ",\t ");
-  appendTextToFile(filename, currentCondition + ",\t\t ");
-  appendTextToFile(filename, textileReading + ",\t\t ");
-  appendTextToFile(filename, textileResistance + ",\t\t ");
-  appendTextToFile(filename, newton + ",\t\t ");
-  appendTextToFile(filename, weightPlaced + ",\t\t ");
-  appendTextToFile(filename, "\r\n"); 
-  lineCounter++;
-  //println("We wrote data with the ID: " + lineCounter + " to the file");
+void keyPressed() {
+  if (key == ' ') { // space bar pressed
+    spacePressed = true;
+  }
+  //println("Key pressed: "+key);
 }
 
+// write a different function for each task?
+//void logLine() {
+//  // missing:
+//  // incoming value, newton (computed by Newtonmeter), 
+  
+//  //log this --> ID, currentCondition, currentAction, currentRepitition, textileReading, textileResistance, newton
+//  appendTextToFile(filename, textileID + ",\t ");
+//  appendTextToFile(filename, currentTime() + ",\t ");
+//  appendTextToFile(filename, currentTask + ",\t\t ");
+//  appendTextToFile(filename, textileReading + ",\t\t ");
+//  appendTextToFile(filename, textileResistance + ",\t\t ");
+//  appendTextToFile(filename, newton + ",\t\t ");
+//  appendTextToFile(filename, weightPlaced + ",\t\t ");
+//  appendTextToFile(filename, "\r\n"); 
+//  lineCounter++;
+//  //println("We wrote data with the ID: " + lineCounter + " to the file");
+//}
+
+
+void updateTask(int tid) {
+  currentTask = tid;
+  taskStage = 0;
+  instructions = null;
+  wid = 0;
+  if (currentTask < 0 || currentTask == tasks.length) {
+    currentTask = 0;
+    //currentRepetition++;
+  }
+  //if (currentRepetition == numberOfRepititions) {
+  //  fill(100);
+  //  rect(0, 0, width, height);
+  //  fill(255);
+  //  text("DONE!", width/2, height/2);
+  //  arduino.write("f 0 0");
+  //  noLoop();
+  //}
+  //write to arduino
+  //write 
+  //frequency condition is frequency (as chosen from the freqSelector, as determined by random number)
+  //frequencyCondition = frequency[freqSelector[randomCondition[(participantID*3)+currentRepetition][currentCondition]]]; 
+  //pulseWidthCondition = duration[durationSelector[randomCondition[(participantID*3)+currentRepetition][currentCondition]]];
+}
 
 String currentTime() {
   return String.valueOf(hour()) + ":" + String.valueOf(minute()) +  " " + String.valueOf(day()) +  "/"  + String.valueOf(month()) +  "/" +   String.valueOf(year());

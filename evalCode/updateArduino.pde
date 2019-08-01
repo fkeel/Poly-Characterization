@@ -1,33 +1,3 @@
-void updateArduino() {
-  /*
-  //write to arduino
-   arduino.write("f 0 0");
-   delay(30);
-   //write 
-   arduino.write("u " + frequencyCondition + " " + pulseWidthCondition);
-   println("u " + frequencyCondition + " " + pulseWidthCondition);
-   delay(30);
-   arduino.write("s 0 0");
-   hapticsOn = true;
-   */
-}
-
-void updateNewtonmeter() {
-  /*
-  //write to arduino
-   arduino.write("f 0 0");
-   delay(30);
-   //write 
-   arduino.write("u " + frequencyCondition + " " + pulseWidthCondition);
-   println("u " + frequencyCondition + " " + pulseWidthCondition);
-   delay(30);
-   arduino.write("s 0 0");
-   hapticsOn = true;
-   */
-}
-
-
-
 //This is the function that receives and parses the data
 //it executes whenever data is received 
 void serialEvent(Serial arduinoPort) { 
@@ -40,5 +10,12 @@ void serialEvent(Serial arduinoPort) {
     //  println(incomingValues);
     connectionEstablished = true;
     calculateResistance();
+    
+    if(recording) {
+      if(recordM.recordingNM()) { 
+        recordM.addNMValue(readNewton());
+      }
+      recordM.addValues(incomingValues);
+    }
   }
-} 
+}
