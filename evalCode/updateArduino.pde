@@ -1,29 +1,29 @@
 void updateArduino() {
   /*
   //write to arduino
-  arduino.write("f 0 0");
-  delay(30);
-  //write 
-  arduino.write("u " + frequencyCondition + " " + pulseWidthCondition);
-  println("u " + frequencyCondition + " " + pulseWidthCondition);
-  delay(30);
-  arduino.write("s 0 0");
-  hapticsOn = true;
-  */
+   arduino.write("f 0 0");
+   delay(30);
+   //write 
+   arduino.write("u " + frequencyCondition + " " + pulseWidthCondition);
+   println("u " + frequencyCondition + " " + pulseWidthCondition);
+   delay(30);
+   arduino.write("s 0 0");
+   hapticsOn = true;
+   */
 }
 
 void updateNewtonmeter() {
   /*
   //write to arduino
-  arduino.write("f 0 0");
-  delay(30);
-  //write 
-  arduino.write("u " + frequencyCondition + " " + pulseWidthCondition);
-  println("u " + frequencyCondition + " " + pulseWidthCondition);
-  delay(30);
-  arduino.write("s 0 0");
-  hapticsOn = true;
-  */
+   arduino.write("f 0 0");
+   delay(30);
+   //write 
+   arduino.write("u " + frequencyCondition + " " + pulseWidthCondition);
+   println("u " + frequencyCondition + " " + pulseWidthCondition);
+   delay(30);
+   arduino.write("s 0 0");
+   hapticsOn = true;
+   */
 }
 
 
@@ -37,7 +37,8 @@ void serialEvent(Serial arduinoPort) {
   //this splits the incoming string into an array of integers that is easy to work with
   if (rawIncomingValues != null) {
     incomingValues = int(trim(splitTokens(rawIncomingValues, ",")));
-  //  println(incomingValues);
-    connectionEstablished = true; 
+    //  println(incomingValues);
+    connectionEstablished = true;
+    calculateResistance();
   }
 } 
