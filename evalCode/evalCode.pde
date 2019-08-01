@@ -30,19 +30,19 @@ float resistanceEstimates[] = {0, 0, 0, 0, 0, 0, 0}; //array for storing the res
 
 //----------------------------------------------------------//
 
-int textileID; // serialStep1Step2 --> 000_000_0000 --> ID_Minutes_Minutes
+String textileID = "e4"; // serialStep1Step2 --> 000_000_0000 --> ID_Minutes_Minutes
 int sampleID; // count the number of samples collected 
 int textileReading; // ADC values
 int textileVoltage; // transform ADC values to voltage;
 int textileResistance; //calculate resistance based on voltage divider formula
 int newton; // newton
 
-String filename = "testrun2.txt";
+String filename = "e4.csv";
 boolean spacePressed = false;
 boolean recording = false;
 int startTime = -1;
 int countdown;
-int[] taskDelays = { 5000 /*PressureDynamics*/, 2000 /*Pressure*/, 2000 /*Square*/, 2000 /*Stretching*/};
+int[] taskDelays = { 20000 /*PressureDynamics*/, 2000 /*Pressure*/, 2000 /*Square*/, 2000 /*Stretching*/};
 RecordManager recordM = new RecordManager();
 
 int wid = 0;
@@ -95,11 +95,11 @@ void setup() {
   printArray(Serial.list());
   //chose your serial port, by putting the correct number in the square brackets 
   //you might need to just trial and error this, the first time you do it
-  //String serialPort = Serial.list()[0];
+  String serialPort = Serial.list()[0];
   //check if you are using the port you think you are using
-  //println("You are using this port: " + serialPort);
+  println("You are using this port: " + serialPort);
   // Open the port with the same baud rate you set in your arduino
-  //arduinoPort = new Serial(this, serialPort, 9600);
+  arduinoPort = new Serial(this, serialPort, 9600);
   //-----------endSerial------------//
 
   //initializing the buttons. The text is formatted like this: "name of button: button hotkey"
@@ -112,7 +112,7 @@ void setup() {
   // currentCondition = 0; <--- index/samples
   //updateArduino();
   
-  //setupNewtonmeter(nmPort);
+  setupNewtonmeter(Serial.list()[1]);
 }
 
 
@@ -180,12 +180,15 @@ void draw() {
           }
         }
         break;
-    case 4:
-      recording = false;
-      recordM.record(textileID, taskname, -1);
-      instructions = "Data recorded in "+filename+"!";
-      break;
-    }
+      case 4:
+        recording = false;
+        recordM.record(textileID, taskname, -1);
+        instructions = "Data recorded in "+filename+"!";
+        taskStage = 5;
+        break;
+      case 5:
+        break;
+      }
   } else if (taskname.equals("Pressure")) {
     switch(taskStage) {
       case 0:

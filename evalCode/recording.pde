@@ -18,9 +18,10 @@ class RecordManager {
   
   boolean recordingNM() { return recordN; }
   
-  void record(int textID, String taskname, int weight) {
+  void record(String textID, String taskname, int weight) {
+      // header: TextileID,Time,Taskname,10M,1M,330k,100k,47k,10k,4.7k,1k,407,220,47,10,4.7,Newton,Weight
     for(int vi=0; vi<chipValues.size(); vi++) {
-      String line = String.format("%d,%d,%s,", textID, millis(), taskname);
+      String line = String.format("%s,%d,%s,", textID, millis(), taskname);
       for(int v: chipValues.get(vi)) {
         line += v+",";
       }
@@ -28,5 +29,6 @@ class RecordManager {
       line += weight+",";
       appendTextToFile(filename, line.substring(0, line.length()-1)+"\n");
     }
+    clearValues();
   }
 };

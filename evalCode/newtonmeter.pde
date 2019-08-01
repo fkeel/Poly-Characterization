@@ -10,7 +10,7 @@ void setupNewtonmeter(String portname) {
 float readNewton() {
   float newton = 0;
   // ask Newtonmeter to provide data
-  if(port.available() > 0) { port.write("?"); }
+  port.write("?");
   
   byte[] inBuffer = new byte[5];
   if(port.available() > 0) {
@@ -19,7 +19,7 @@ float readNewton() {
     if (inBuffer != null) {
       String force = new String(inBuffer);
       force = force.substring(1, force.length()-2);
-      newton = float(force);
+      newton = float(force); 
       //println(fv);
     }
   } 
