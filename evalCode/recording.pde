@@ -26,6 +26,7 @@ class RecordManager {
         line += v+",";
       }
       if(recordN) { line += nmValues.get(vi)+","; }
+      else { line += "-1,";   }
       line += weight+",";
       appendTextToFile(filename, line.substring(0, line.length()-1)+"\n");
     }

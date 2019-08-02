@@ -1,4 +1,6 @@
 //Data collection code for magnet-feedback experiment
+String filename = "008_015_030.csv";
+String textileID = "008_015_030"; // serialStep1Step2 --> 000_000_0000 --> ID_Minutes_Minutes
 
 //for logging data
 import java.io.BufferedWriter; //log lines
@@ -30,24 +32,24 @@ float resistanceEstimates[] = {0, 0, 0, 0, 0, 0, 0}; //array for storing the res
 
 //----------------------------------------------------------//
 
-String textileID = "e4"; // serialStep1Step2 --> 000_000_0000 --> ID_Minutes_Minutes
+
 int sampleID; // count the number of samples collected 
 int textileReading; // ADC values
 int textileVoltage; // transform ADC values to voltage;
 int textileResistance; //calculate resistance based on voltage divider formula
 int newton; // newton
 
-String filename = "e4.csv";
+
 boolean spacePressed = false;
 boolean recording = false;
 int startTime = -1;
 int countdown;
-int[] taskDelays = { 20000 /*PressureDynamics*/, 2000 /*Pressure*/, 2000 /*Square*/, 2000 /*Stretching*/};
+int[] taskDelays = { 15000 /*PressureDynamics*/, 2000 /*Pressure*/, 2000 /*Square*/, 2000 /*Stretching*/};
 RecordManager recordM = new RecordManager();
 
 int wid = 0;
 int weightsPressure[] = {5, 10, 20, 50, 100, 200, 500}; //populate array with weights to use in characterization
-int weightsStrain[] = {10, 20, 50, 100}; //populate array with weights to use in characterization
+int weightsStrain[] = {5, 10, 20, 50, 100, 200, 500}; //populate array with weights to use in characterization
 
 int numberOfSamples = 300; //how many samples should be recorded
 //int numberOfConditions = 4; //pressure vs stretch
@@ -138,12 +140,13 @@ void draw() {
           spacePressed = false;
           instructions = "Get ready";
           //startTime = millis();
-          countdown = millis() + 3000;
+          countdown = millis() + 5000;
         }
         break;
       case 1:
+      background(250, 170, 210);
         if(countdown <= millis()) {
-          instructions = "Put the weight on the material";
+                      instructions = "Put the weight on the material";
           timer = null;
           taskStage = 2;
           //recording = false;
@@ -157,6 +160,7 @@ void draw() {
         if(recording) {
           int dt = millis() - startTime;
           if(dt > taskDelays[currentTask]) {
+              background(250, 170, 210);
             instructions = "Remove the weight from the material";
             timer = null;
             taskStage = 3;
@@ -290,6 +294,7 @@ void draw() {
         break;
       case 3:
         instructions = "All data recorded in "+filename+"!";
+        exit();
         break;
     }
   }
@@ -303,10 +308,10 @@ void draw() {
 
 
   // for debugging
-  if(recording) {
-    recordM.addValues(new int[]{ 0, 1, 2, 3, 4, 5, 6, 7, 8 });
-    recordM.addNMValue(10);
-  }
+  //if(recording) {
+  //  recordM.addValues(new int[]{ 0, 1, 2, 3, 4, 5, 6, 7, 8 });
+  //  recordM.addNMValue(10);
+  //}
 
 
 
@@ -395,6 +400,8 @@ void updateTask(int tid) {
   taskStage = 0;
   instructions = null;
   wid = 0;
+  timer = null;
+  spacePressed = false;
   if (currentTask < 0 || currentTask == tasks.length) {
     currentTask = 0;
     //currentRepetition++;
