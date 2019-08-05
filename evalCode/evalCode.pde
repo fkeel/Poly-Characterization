@@ -1,6 +1,6 @@
 //Data collection code for magnet-feedback experiment
-String filename = "008_015_030.csv";
-String textileID = "008_015_030"; // serialStep1Step2 --> 000_000_0000 --> ID_Minutes_Minutes
+String filename = "003_015_060.csv";
+String textileID = "003_015_080"; // serialStep1Step2 --> 000_000_0000 --> ID_Minutes_Minutes
 
 //for logging data
 import java.io.BufferedWriter; //log lines
@@ -197,7 +197,7 @@ void draw() {
     switch(taskStage) {
       case 0:
         if(instructions == null) {
-          if(wid < weightsPressure.length) { instructions = String.format("Place %dg on the material", weightsPressure[wid]); }
+          if(wid < weightsPressure.length) { instructions = String.format("Place %dg on the material (Spacebar starts recrording)", weightsPressure[wid]); }
           else { taskStage = 3; }
         }
         if(spacePressed) {
@@ -232,7 +232,7 @@ void draw() {
   } else if (taskname.equals("SquareResistance")) {
     switch(taskStage) {
       case 0:
-        if(instructions == null) { instructions = "Place the electrodes on the material"; }
+        if(instructions == null) { instructions = "Place the electrodes on the material (SWAP ELECTRODES)"; }
         if(spacePressed) {
           taskStage = 1;
           recordM.recordNM(false);
