@@ -1,6 +1,6 @@
 //Data collection code for magnet-feedback experiment
 String filename = "003_015_060.csv";
-String textileID = "003_015_080"; // serialStep1Step2 --> 000_000_0000 --> ID_Minutes_Minutes
+String textileID = "003_015_060"; // serialStep1Step2 --> 000_000_0000 --> ID_Minutes_Minutes
 
 //for logging data
 import java.io.BufferedWriter; //log lines
