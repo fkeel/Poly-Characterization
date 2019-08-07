@@ -37,6 +37,9 @@ void createFile(File f) {
   try {
     parentDir.mkdirs(); 
     f.createNewFile();
+    PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(f, true)));
+    out.print(HEADER);
+    out.close();
   }
   catch(Exception e) {
     e.printStackTrace();
