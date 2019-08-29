@@ -9,7 +9,7 @@ import java.io.FileWriter; //create files
 //----------Serial---------------//
 import processing.serial.*; //include the serial library
 
-Serial arduinoPort;  // The serial port at which we listen to data from the Arduino 
+Serial arduinoPort;  // The serial port at which we listen to data from the Arduino
 String rawIncomingValues; //this is where you dump the content of the serial port
 int[] incomingValues = { 0, 0, 0, 0, 0, 0, 0 };     //this is where you will store the incoming values, so you can use them in your program
 int token = 10; //10 is the linefeed number in ASCII
@@ -23,8 +23,8 @@ boolean connectionEstablished = false;
 
 long resistor2Values[] = {10000000, 1000000, 100000, 10000, 1000, 220, 10}; //
 float voltIn = 3.3;
-float[] calculatedVoltages  = { 0, 0, 0, 0, 0, 0, 0 }; 
-float[] calculatedResistance  = { 0, 0, 0, 0, 0, 0, 0 }; 
+float[] calculatedVoltages  = { 0, 0, 0, 0, 0, 0, 0 };
+float[] calculatedResistance  = { 0, 0, 0, 0, 0, 0, 0 };
 int midPoint = 1024; //use this for chosing which resistance calculation is the most reliable
 int numberOfresister2 = 7;
 float voltOut[] = {0, 0, 0, 0, 0, 0, 0}; //array for storing the voltages (won't be used)
@@ -35,7 +35,7 @@ String HEADER = "ID,Time,Task,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,R13,Newton,
 //----------------------------------------------------------//
 
 
-int sampleID; // count the number of samples collected 
+int sampleID; // count the number of samples collected
 int textileReading; // ADC values
 int textileVoltage; // transform ADC values to voltage;
 int textileResistance; //calculate resistance based on voltage divider formula
@@ -61,7 +61,7 @@ int taskStage = 0;
 
 int lineCounter = 0; //will be incremented with each writing
 int currentTask = 0;
-//String currentConditionName; 
+//String currentConditionName;
 //int currentRepetition;
 
 //log this --> ID, currentCondition, currentAction, currentRepitition, textileReading, textileResistance, newton
@@ -88,7 +88,7 @@ void setup() {
 
 
   textAlign(CENTER);
-  font = createFont("arial", 18); //this is just for easthetics. 
+  font = createFont("arial", 18); //this is just for easthetics.
   textFont(font);
 
   size(1000, 600);
@@ -97,7 +97,7 @@ void setup() {
   // List all the available serial ports
   println("these are the available ports: ");
   printArray(Serial.list());
-  //chose your serial port, by putting the correct number in the square brackets 
+  //chose your serial port, by putting the correct number in the square brackets
   //you might need to just trial and error this, the first time you do it
   String serialPort = Serial.list()[0];
   //check if you are using the port you think you are using
@@ -115,7 +115,7 @@ void setup() {
   //experiment logic
   // currentCondition = 0; <--- index/samples
   //updateArduino();
-  
+
   setupNewtonmeter(Serial.list()[1]);
 }
 
@@ -131,7 +131,7 @@ void draw() {
   if (taskname.equals("PressureDynamics")) {
     //placeWeight.display(20, 20, 200, 200);
     //logLine();
-  
+
     switch(taskStage) {
       case 0:
         if(instructions == null) { instructions = "Press the 'space' bar to start recording"; }
@@ -153,7 +153,7 @@ void draw() {
           taskStage = 2;
           //recording = false;
           startTime = millis();
-        } else { 
+        } else {
           int dt = countdown-millis();
           timer = (dt/1000) + ":" + (dt%1000);
         }
@@ -168,7 +168,7 @@ void draw() {
             taskStage = 3;
             //recording = false;
             startTime = millis();
-          } else { 
+          } else {
             timer = (dt/1000) + ":" + (dt%1000);
           }
         }
@@ -181,7 +181,7 @@ void draw() {
             instructions = "Task finished (recording data)";
             timer = null;
             taskStage = 4;
-          } else { 
+          } else {
             timer = (dt/1000) + ":" + (dt%1000);
           }
         }
@@ -381,8 +381,8 @@ void keyPressed() {
 // write a different function for each task?
 //void logLine() {
 //  // missing:
-//  // incoming value, newton (computed by Newtonmeter), 
-  
+//  // incoming value, newton (computed by Newtonmeter),
+
 //  //log this --> ID, currentCondition, currentAction, currentRepitition, textileReading, textileResistance, newton
 //  appendTextToFile(filename, textileID + ",\t ");
 //  appendTextToFile(filename, currentTime() + ",\t ");
@@ -391,7 +391,7 @@ void keyPressed() {
 //  appendTextToFile(filename, textileResistance + ",\t\t ");
 //  appendTextToFile(filename, newton + ",\t\t ");
 //  appendTextToFile(filename, weightPlaced + ",\t\t ");
-//  appendTextToFile(filename, "\r\n"); 
+//  appendTextToFile(filename, "\r\n");
 //  lineCounter++;
 //  //println("We wrote data with the ID: " + lineCounter + " to the file");
 //}
@@ -417,9 +417,9 @@ void updateTask(int tid) {
   //  noLoop();
   //}
   //write to arduino
-  //write 
+  //write
   //frequency condition is frequency (as chosen from the freqSelector, as determined by random number)
-  //frequencyCondition = frequency[freqSelector[randomCondition[(participantID*3)+currentRepetition][currentCondition]]]; 
+  //frequencyCondition = frequency[freqSelector[randomCondition[(participantID*3)+currentRepetition][currentCondition]]];
   //pulseWidthCondition = duration[durationSelector[randomCondition[(participantID*3)+currentRepetition][currentCondition]]];
 }
 

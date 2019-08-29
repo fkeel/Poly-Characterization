@@ -1,6 +1,6 @@
 //This is the function that receives and parses the data
-//it executes whenever data is received 
-void serialEvent(Serial arduinoPort) { 
+//it executes whenever data is received
+void serialEvent(Serial arduinoPort) {
   //we read the incoming data until we have found our toke (its defined at the top, but can be any character
   rawIncomingValues = arduinoPort.readStringUntil(token);
   //if there actually is a valid incoming value, we use the splitTokens
@@ -12,7 +12,7 @@ void serialEvent(Serial arduinoPort) {
     calculateResistance();
     
     if(recording) {
-      if(recordM.recordingNM()) { 
+      if(recordM.recordingNM()) {
         recordM.addNMValue(readNewton());
       }
       recordM.addValues(incomingValues);
