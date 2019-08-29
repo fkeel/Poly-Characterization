@@ -27,8 +27,6 @@ float[] calculatedVoltages  = { 0, 0, 0, 0, 0, 0, 0 };
 float[] calculatedResistance  = { 0, 0, 0, 0, 0, 0, 0 };
 int midPoint = 1024; //use this for chosing which resistance calculation is the most reliable
 int numberOfresister2 = 7;
-float voltOut[] = {0, 0, 0, 0, 0, 0, 0}; //array for storing the voltages (won't be used)
-float resistanceEstimates[] = {0, 0, 0, 0, 0, 0, 0}; //array for storing the resistances (won't be used)
 
 String HEADER = "ID,Time,Task,R1,R2,R3,R4,R5,R6,R7,R8,R9,R10,R11,R12,R13,Newton,Weight";
 
@@ -300,13 +298,6 @@ void draw() {
         break;
     }
   }
-
-
-  //for (int i = 0; i < numberOfresister2 - 1; i++) { //set all pins as input, so that no current can flow
-  //  print(resistanceEstimates[i]);
-  //  print(", ");
-  //}
-  //println(resistanceEstimates[numberOfresister2 - 1]);
 
 
   // for debugging

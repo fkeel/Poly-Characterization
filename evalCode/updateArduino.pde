@@ -9,8 +9,7 @@ void serialEvent(Serial arduinoPort) {
     incomingValues = int(trim(splitTokens(rawIncomingValues, ",")));
     //  println(incomingValues);
     connectionEstablished = true;
-    calculateResistance();
-    
+
     if(recording) {
       if(recordM.recordingNM()) {
         recordM.addNMValue(readNewton());
